@@ -4,7 +4,7 @@ import git
 def generate_commit_message(diff_text):
     # A simple placeholder for AI-based message generation logic
     if not diff_text.strip():
-        return "No changes made."
+        return "Changes made."
     
     # Here you can implement AI logic to analyze diff_text
     # For now, we return a placeholder message
