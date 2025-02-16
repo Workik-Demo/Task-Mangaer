@@ -2,8 +2,12 @@ import os
 import git
 
 def generate_commit_message(diff_text):
+    # A simple placeholder for AI-based message generation logic
     if not diff_text.strip():
         return "No changes made."
+    
+    # Here you can implement AI logic to analyze diff_text
+    # For now, we return a placeholder message
     return f"Updated code with changes: {len(diff_text.splitlines())} lines affected."
 
 def main(repo_path):
@@ -23,8 +27,7 @@ def main(repo_path):
     # Collect the diff information
     diff_text = ""
     for diff in diffs:
-        diff_text += diff.diff  # Removed .decode('utf-8'), as diff.diff is already a string
-
+        diff_text += diff.diff  # Use diff.diff directly, no decode needed
     # Generate commit message
     commit_message = generate_commit_message(diff_text)
 
@@ -40,5 +43,5 @@ def main(repo_path):
     print("Changes pushed to the remote repository.")
 
 if __name__ == "__main__":
-    repository_path = r'C:\Users\KIIT\OneDrive\Desktop\Workik\Docker\express_task_manager'  # Update this path accordingly
+    repository_path = r'C:\Users\KIIT\OneDrive\Desktop\Workik\Docker\express_task_manager'  # Ensure this is correct
     main(repository_path)
