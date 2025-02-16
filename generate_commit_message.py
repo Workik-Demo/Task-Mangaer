@@ -1,19 +1,10 @@
 import os
 import git
 
-def generate_commit_message(diff):
-    # Basic heuristic to generate commit messages
-    added_lines = sum(1 for line in diff.splitlines() if line.startswith('+') and not line.startswith('+++'))
-    removed_lines = sum(1 for line in diff.splitlines() if line.startswith('-') and not line.startswith('---'))
-    
-    if added_lines > 0 and removed_lines > 0:
-        return f"Modified {added_lines} lines and removed {removed_lines} lines."
-    elif added_lines > 0:
-        return f"Added {added_lines} lines."
-    elif removed_lines > 0:
-        return f"Removed {removed_lines} lines."
-    else:
-        return "No changes detected."
+def generate_commit_message(diff_text):
+    if not diff_text.strip():
+        return "No changes made."
+    return f"Updated code with changes: {len(diff_text.splitlines())} lines affected."
 
 def main(repo_path):
     if not os.path.exists(repo_path):
@@ -26,17 +17,28 @@ def main(repo_path):
     # Get the latest commit
     latest_commit = repo.head.commit
 
-    # Get the diff of the latest commit
-    diff = latest_commit.diff('HEAD~1', create_patch=True).patch
+    # Get the diff of the latest commit (against the previous commit)
+    diffs = latest_commit.diff('HEAD~1')
+
+    # Collect the diff information
+    diff_text = ""
+    for diff in diffs:
+        diff_text += diff.diff  # Removed .decode('utf-8'), as diff.diff is already a string
 
     # Generate commit message
-    commit_message = generate_commit_message(diff)
+    commit_message = generate_commit_message(diff_text)
 
     # Print the generated commit message
     print("Generated Commit Message:")
     print(commit_message)
 
+    repo.git.add(A=True)
+    repo.index.commit(commit_message)
+
+    origin = repo.remote(name='origin')
+    origin.push()
+    print("Changes pushed to the remote repository.")
+
 if __name__ == "__main__":
-    # Specify the path to your Git repository
-    repository_path = r'C:\Users\KIIT\OneDrive\Desktop\Workik\Docker\express_task_manager'
+    repository_path = r'C:\Users\KIIT\OneDrive\Desktop\Workik\Docker\express_task_manager'  # Update this path accordingly
     main(repository_path)
