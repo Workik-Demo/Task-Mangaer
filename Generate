@@ -1,0 +1,51 @@
+import os
+import git
+
+def generate_commit_message(diff_text):
+    # Analyze the diff_text to generate a meaningful commit message
+    if not diff_text.strip():
+        return "No changes made."
+
+    lines_added = sum(1 for line in diff_text.splitlines() if line.startswith('+') and not line.startswith('+++'))
+    lines_removed = sum(1 for line in diff_text.splitlines() if line.startswith('-') and not line.startswith('---'))
+    
+    message = f"Updated code: {lines_added} lines added, {lines_removed} lines removed."
+    return message
+
+def main(repo_path):
+    if not os.path.exists(repo_path):
+        print(f"Repository path '{repo_path}' does not exist.")
+        return
+
+    # Open the repository
+    repo = git.Repo(repo_path)
+
+    # Get the latest commit
+    latest_commit = repo.head.commit
+
+    # Get the diff of the latest commit (against the previous commit)
+    diffs = latest_commit.diff('HEAD~1')
+
+    # Collect the diff information
+    diff_text = ""
+    for diff in diffs:
+        diff_text += diff.diff  # Use diff.diff directly, no decode needed
+
+    # Generate commit message
+    commit_message = generate_commit_message(diff_text)
+
+    # Print the generated commit message
+    print("Generated Commit Message:")
+    print(commit_message)
+
+    # Stage changes and create a commit
+    repo.git.add(A=True)  # Stage all changes
+    repo.index.commit(commit_message)  # Commit with the generated message
+
+    # Push the commit to GitHub
+    origin = repo.remote(name='origin')
+    origin.push()
+
+if __name__ == "__main__":
+    repository_path = r'C:\Users\KIIT\OneDrive\Desktop\Workik\Docker\express_task_manager'  # Update with your repository path
+    main(repository_path)
